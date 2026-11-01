@@ -1,0 +1,61 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONUR GAME — Free PC Games</title>
+<style>
+:root{--bg:#080d18;--panel:#111c2e;--blue:#168cff;--cyan:#00d9ff;--txt:#f4f8ff;--muted:#a6b5ca}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#12345e 0,transparent 34%),var(--bg);color:var(--txt);font-family:Arial,sans-serif}
+header{padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1c3150;background:#080d18ee;position:sticky;top:0;z-index:3}.logo{font-size:27px;font-weight:900;letter-spacing:1px}.logo span,h1 span{color:var(--cyan)}nav a{color:#dceaff;text-decoration:none;margin-left:20px}
+.hero{padding:60px 6%;background:linear-gradient(110deg,#0d1c35ed,#0b1424b8)}.hero small{color:var(--cyan);font-weight:bold;letter-spacing:3px}.hero h1{font-size:clamp(40px,7vw,70px);margin:13px 0}.hero p{color:var(--muted);max-width:680px;line-height:1.6}.search{display:flex;max-width:570px;margin-top:22px}.search input{flex:1;min-width:0;padding:15px;border:1px solid #29496d;background:#0b1526;color:white;border-radius:9px 0 0 9px;outline:none}.search button{border:0;background:var(--blue);color:white;padding:0 20px;font-weight:bold;border-radius:0 9px 9px 0;cursor:pointer}
+main{padding:28px 6% 65px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.head h2{font-size:27px}.count{color:var(--muted);font-size:13px}.filters{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 20px}.filters button{padding:9px 14px;background:#14243b;color:#dceaff;border:1px solid #284363;border-radius:20px;cursor:pointer}.filters button.active{background:var(--blue);border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:17px}.card{background:linear-gradient(145deg,#15243a,#0e1727);border:1px solid #203957;border-radius:14px;overflow:hidden;transition:.2s}.card:hover{transform:translateY(-3px);border-color:var(--cyan)}.cover{width:100%;height:135px;object-fit:cover;display:block;background:#14243b}.info{padding:15px}.meta{display:flex;justify-content:space-between;gap:8px;align-items:center}.tag{font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:1px}.free{font-size:11px;color:#72f0b1;border:1px solid #276c57;padding:4px 7px;border-radius:20px}.info h3{margin:10px 0 7px}.info p{color:var(--muted);font-size:13px;line-height:1.45;min-height:37px}.download{display:inline-block;margin-top:7px;color:white;background:#126ed0;padding:10px 13px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:bold}.download:hover{background:#168cff}.note{margin:25px 0 0;padding:14px 16px;border:1px solid #294363;border-radius:10px;color:var(--muted);font-size:13px;line-height:1.6}.empty{color:var(--muted);padding:25px}
+footer{text-align:center;padding:25px;color:var(--muted);border-top:1px solid #1c3150}
+@media(max-width:600px){header{padding:16px 5%}nav a{margin-left:10px;font-size:13px}.hero,main{padding-left:5%;padding-right:5%}}
+</style></head>
+<body>
+<header><div class="logo">ONUR <span>GAME</span></div><nav><a href="#games">Free Games</a><a href="#about">About</a></nav></header>
+<section class="hero"><small>FREE PC GAMES</small><h1>DOWNLOAD &amp;<br><span>PLAY FOR FREE.</span></h1><p>Discover free-to-play PC games. Every download button takes you to the game's official publisher or download page. Game files are provided by the publishers, not hosted here.</p>
+<div class="search"><input id="search" type="search" placeholder="Search free PC games..."><button onclick="render()">SEARCH</button></div></section>
+<main id="games"><div class="head"><h2>Free PC Game Library</h2><span class="count" id="count"></span></div><div class="filters" id="filters"></div><div class="grid" id="grid"></div>
+<div class="note"><b>Important:</b> ONUR GAME links to official, legal download pages. Some games require a publisher launcher or account. This website does not host or redistribute game installers.</div>
+</main><footer id="about">© 2026 ONUR GAME · Free PC Games Directory</footer>
+<script>
+const games=[
+{name:"VALORANT",cat:"Shooter",desc:"5v5 tactical character-based shooter.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/359550/header.jpg",url:"https://playvalorant.com/en-us/download/",publisher:"Riot Games"},
+{name:"Fortnite",cat:"Shooter",desc:"Battle royale, creative worlds and more.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/990080/header.jpg",url:"https://www.fortnite.com/download",publisher:"Epic Games"},
+{name:"League of Legends",cat:"Strategy",desc:"Team-based competitive multiplayer battle arena.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/20590/header.jpg",url:"https://www.leagueoflegends.com/en-us/download/",publisher:"Riot Games"},
+{name:"Dota 2",cat:"Strategy",desc:"Competitive 5v5 strategy action game.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg",url:"https://store.steampowered.com/app/570/Dota_2/",publisher:"Valve"},
+{name:"Counter-Strike 2",cat:"Shooter",desc:"Competitive tactical first-person shooter.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg",url:"https://store.steampowered.com/app/730/CounterStrike_2/",publisher:"Valve"},
+{name:"Warframe",cat:"Shooter",desc:"Co-op online action with sci-fi combat.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/230410/header.jpg",url:"https://www.warframe.com/download",publisher:"Digital Extremes"},
+{name:"Apex Legends",cat:"Shooter",desc:"Squad-based hero battle royale.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg",url:"https://www.ea.com/games/apex-legends",publisher:"Electronic Arts"},
+{name:"PUBG: BATTLEGROUNDS",cat:"Shooter",desc:"Battle royale survival competition.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/578080/header.jpg",url:"https://store.steampowered.com/app/578080/PUBG_BATTLEGROUNDS/",publisher:"KRAFTON"},
+{name:"Overwatch 2",cat:"Shooter",desc:"Team-based hero shooter.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/2357570/header.jpg",url:"https://overwatch.blizzard.com/",publisher:"Blizzard"},
+{name:"Team Fortress 2",cat:"Shooter",desc:"Class-based team multiplayer action.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/440/header.jpg",url:"https://store.steampowered.com/app/440/Team_Fortress_2/",publisher:"Valve"},
+{name:"Rocket League",cat:"Sports",desc:"Arcade car football with online matches.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/252950/header.jpg",url:"https://www.rocketleague.com/",publisher:"Psyonix / Epic"},
+{name:"The Sims 4",cat:"Simulation",desc:"Create characters, build homes and play life stories.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1222670/header.jpg",url:"https://www.ea.com/games/the-sims/the-sims-4/download",publisher:"Electronic Arts"},
+{name:"Genshin Impact",cat:"Adventure",desc:"Open-world fantasy action RPG.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1817070/header.jpg",url:"https://genshin.hoyoverse.com/en/download",publisher:"HoYoverse"},
+{name:"Honkai: Star Rail",cat:"RPG",desc:"Fantasy sci-fi turn-based role-playing adventure.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1817070/header.jpg",url:"https://hsr.hoyoverse.com/en-us/",publisher:"HoYoverse"},
+{name:"Roblox",cat:"Adventure",desc:"Play and create experiences made by the community.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/431960/header.jpg",url:"https://www.roblox.com/download",publisher:"Roblox"},
+{name:"Unturned",cat:"Survival",desc:"Free-to-play zombie survival sandbox.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/304930/header.jpg",url:"https://store.steampowered.com/app/304930/Unturned/",publisher:"Smartly Dressed Games"},
+{name:"Trackmania",cat:"Racing",desc:"Time-trial racing and creative tracks.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/2225070/header.jpg",url:"https://www.trackmania.com/",publisher:"Ubisoft"},
+{name:"World of Tanks",cat:"Action",desc:"Online team tank battles.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1407200/header.jpg",url:"https://worldoftanks.com/",publisher:"Wargaming"},
+{name:"World of Warships",cat:"Action",desc:"Online naval combat game.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/552990/header.jpg",url:"https://worldofwarships.com/",publisher:"Wargaming"},
+{name:"Brawlhalla",cat:"Fighting",desc:"Free platform fighting game.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/291550/header.jpg",url:"https://www.brawlhalla.com/",publisher:"Ubisoft"},
+{name:"Path of Exile",cat:"RPG",desc:"Online dark fantasy action RPG.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/238960/header.jpg",url:"https://www.pathofexile.com/download",publisher:"Grinding Gear Games"},
+{name:"The Finals",cat:"Shooter",desc:"Team-based competitive arena shooter.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/2073850/header.jpg",url:"https://www.reachthefinals.com/",publisher:"Embark Studios"},
+{name:"Once Human",cat:"Survival",desc:"Open-world multiplayer survival adventure.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/2139460/header.jpg",url:"https://www.oncehuman.game/",publisher:"Starry Studio"},
+{name:"Fall Guys",cat:"Party",desc:"Colorful obstacle-course party game.",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg",url:"https://www.fallguys.com/",publisher:"Mediatonic / Epic"}
+];
+const cats=["All",...new Set(games.map(g=>g.cat))];let category="All";
+const filters=document.getElementById("filters");
+filters.innerHTML=cats.map(c=>`<button class="${c==="All"?"active":""}" data-cat="${c}">${c}</button>`).join("");
+filters.addEventListener("click",e=>{if(e.target.dataset.cat){category=e.target.dataset.cat;filters.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.cat===category));render()}});
+function render(){const q=document.getElementById("search").value.trim().toLowerCase();const list=games.filter(g=>(category==="All"||g.cat===category)&&g.name.toLowerCase().includes(q));document.getElementById("count").textContent=`${list.length} of ${games.length} games`;document.getElementById("grid").innerHTML=list.map(g=>`<article class="card"><img class="cover" src="${g.img}" alt="${g.name} cover art" loading="lazy" onerror="this.style.display='none'"><div class="info"><div class="meta"><span class="tag">${g.cat}</span><span class="free">FREE TO PLAY</span></div><h3>${g.name}</h3><p>${g.desc}</p><div class="tag">Publisher: ${g.publisher}</div><br><a class="download" href="${g.url}" target="_blank" rel="noopener noreferrer">DOWNLOAD GAME ↗</a></div></article>`).join("")||'<div class="empty">No games found. Try another search.</div>';}
+document.getElementById("search").addEventListener("input",render);render();
+</script></body></html>'''
+p=Path("/mnt/data/onur_game_website.html")
+p.write_text(html, encoding="utf-8")
+print(f"Created {p} ({p.stat().st_size} bytes)")
